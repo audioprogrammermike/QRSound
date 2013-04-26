@@ -18,6 +18,7 @@ namespace WindowsFormsApplication1
         string WavFilename { get; set; }
         string ImageFilename { get; set; }
         QRSound Sound { get; set; }
+        bool SaveNeeded { get; set; }
 
         enum eMode
         {
@@ -77,6 +78,7 @@ namespace WindowsFormsApplication1
                     button1.Enabled = true;
                     button2.Enabled = true;
                     saveToolStripMenuItem.Enabled = true;
+                    SaveNeeded = true;
                 }
                 catch(Exception ex)
                 {
@@ -120,7 +122,7 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private void saveAudioToolStripMenuItem_Click(object sender, EventArgs e)
+        void SaveData()
         {
             if (Mode == eMode.IMAGE)
             {
@@ -162,6 +164,30 @@ namespace WindowsFormsApplication1
                     }
                 }
             }
+            SaveNeeded = false;
+        }
+
+        private void saveAudioToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveData();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SaveNeeded)
+            {
+                DialogResult result = MessageBox.Show("Unsaved Data", "Save data before quit?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                if(result == DialogResult.Cancel)
+                {
+                    return;
+                }
+                else if(result == DialogResult.Yes)
+                {
+                    SaveData();
+                }
+            }
+
+            Application.Exit();
         }
     }
 }
