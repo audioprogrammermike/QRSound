@@ -41,42 +41,7 @@ namespace WindowsFormsApplication1
             Sound = new QRSound();
         }
 
-        void OpenFile(string filepath)
-        {
-            try
-            {
-                if (Mode == eMode.IMAGE)
-                {
-                    Sound.OpenImage(filepath);
-                    pictureBox1.Image = new Bitmap(filepath);
-
-                    saveToolStripMenuItem.Text = "Save Audio";
-                    Mode = eMode.IMAGE;
-                }
-                else
-                {
-                    Sound.OpenAudio(filepath);
-                    pictureBox1.Image = Sound.GetQRImage();
-
-                    saveToolStripMenuItem.Text = "Save Image";
-                    Mode = eMode.AUDIO;
-                }
-
-                WavFilename = filepath;
-                WavFilename = Path.ChangeExtension(WavFilename, "wav");
-                ImageFilename = Path.ChangeExtension(WavFilename, ".png");
-
-                button1.Enabled = true;
-                button2.Enabled = true;
-                saveToolStripMenuItem.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Failed loading QR image!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-            }
-        }
-
-        private void openToolStripMenuItem1_Click(object sender, EventArgs e) {
+        private void openToolStripMenuItem_Click(object sender, EventArgs e) {
             // Show the dialog and get result.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -86,19 +51,37 @@ namespace WindowsFormsApplication1
 
             DialogResult result = openFileDialog1.ShowDialog();
             if (result == DialogResult.OK) {
-                switch (openFileDialog1.FilterIndex)
+                try
                 {
-                    case 1:
+                    if (openFileDialog1.FilterIndex == 1)
+                    {
+                        Sound.OpenImage(openFileDialog1.FileName);
+                        pictureBox1.Image = new Bitmap(openFileDialog1.FileName);
+
+                        saveToolStripMenuItem.Text = "Save Audio";
                         Mode = eMode.IMAGE;
-                        break;
-                    case 2:
+                    }
+                    else
+                    {
+                        Sound.OpenAudio(openFileDialog1.FileName);
+                        pictureBox1.Image = Sound.GetQRImage();
+
+                        saveToolStripMenuItem.Text = "Save Image";
                         Mode = eMode.AUDIO;
-                        break;
-                    default:
-                        Mode = eMode.IMAGE;
-                        break;
+                    }
+
+                    WavFilename = openFileDialog1.FileName;
+                    WavFilename = Path.ChangeExtension(WavFilename, "wav");
+                    ImageFilename = Path.ChangeExtension(WavFilename, ".png");
+
+                    button1.Enabled = true;
+                    button2.Enabled = true;
+                    saveToolStripMenuItem.Enabled = true;
                 }
-                OpenFile(openFileDialog1.FileName);
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Failed loading QR image!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                }
             }
         }
 
