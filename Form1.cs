@@ -16,7 +16,17 @@ namespace WindowsFormsApplication1
     public partial class Form1 : Form
     {
         string WavFilename { get; set; }
+        string ImageFilename { get; set; }
         QRSound Sound { get; set; }
+
+        enum eMode
+        {
+            IMAGE,
+            AUDIO,
+            MAX
+        }
+
+        eMode Mode { get; set; }
 
         public Form1()
         {
@@ -26,7 +36,7 @@ namespace WindowsFormsApplication1
             button2.Enabled = false;
             button3.Enabled = false;
 
-            saveAudioToolStripMenuItem.Enabled = false;
+            saveToolStripMenuItem.Enabled = false;
 
             Sound = new QRSound();
         }
@@ -35,23 +45,38 @@ namespace WindowsFormsApplication1
             // Show the dialog and get result.
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            openFileDialog1.Filter = "png files (*.png)|*.png";
-            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.Filter = "Image files (*.png)|*.png|Wav files (*.wav)|*.wav";
+            openFileDialog1.FilterIndex = 1;
             openFileDialog1.RestoreDirectory = true;
 
             DialogResult result = openFileDialog1.ShowDialog();
             if (result == DialogResult.OK) {
                 try
                 {
-                    Sound.OpenImage(openFileDialog1.FileName);
-                    pictureBox1.Image = new Bitmap(openFileDialog1.FileName);
+                    if (openFileDialog1.FilterIndex == 1)
+                    {
+                        Sound.OpenImage(openFileDialog1.FileName);
+                        pictureBox1.Image = new Bitmap(openFileDialog1.FileName);
+
+                        saveToolStripMenuItem.Text = "Save Audio";
+                        Mode = eMode.IMAGE;
+                    }
+                    else
+                    {
+                        Sound.OpenAudio(openFileDialog1.FileName);
+                        pictureBox1.Image = Sound.GetQRImage();
+
+                        saveToolStripMenuItem.Text = "Save Image";
+                        Mode = eMode.AUDIO;
+                    }
 
                     WavFilename = openFileDialog1.FileName;
                     WavFilename = Path.ChangeExtension(WavFilename, "wav");
+                    ImageFilename = Path.ChangeExtension(WavFilename, ".png");
 
                     button1.Enabled = true;
                     button2.Enabled = true;
-                    saveAudioToolStripMenuItem.Enabled = true;
+                    saveToolStripMenuItem.Enabled = true;
                 }
                 catch(Exception ex)
                 {
@@ -97,22 +122,44 @@ namespace WindowsFormsApplication1
 
         private void saveAudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Sound.FileLoaded())
+            if (Mode == eMode.IMAGE)
             {
-                // Show the dialog and get result.
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-                saveFileDialog1.InitialDirectory = Path.GetDirectoryName(WavFilename);
-                saveFileDialog1.FileName = Path.GetFileName(WavFilename);
-                saveFileDialog1.Filter = "wav files (*.wav)|*.wav";
-                saveFileDialog1.FilterIndex = 2;
-                saveFileDialog1.RestoreDirectory = true;
-                saveFileDialog1.OverwritePrompt = true;
-
-                DialogResult result = saveFileDialog1.ShowDialog();
-                if (result == DialogResult.OK)
+                if (Sound.FileLoaded())
                 {
-                    WavFilename = saveFileDialog1.FileName;
-                    Sound.SaveAudio(WavFilename);
+                    SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                    saveFileDialog1.InitialDirectory = Path.GetDirectoryName(WavFilename);
+                    saveFileDialog1.FileName = Path.GetFileName(WavFilename);
+                    saveFileDialog1.Filter = "wav files (*.wav)|*.wav";
+                    saveFileDialog1.FilterIndex = 2;
+                    saveFileDialog1.RestoreDirectory = true;
+                    saveFileDialog1.OverwritePrompt = true;
+
+                    DialogResult result = saveFileDialog1.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        WavFilename = saveFileDialog1.FileName;
+                        Sound.SaveAudio(WavFilename);
+                    }
+                }
+            }
+            else if (Mode == eMode.AUDIO)
+            {
+                if (Sound.FileLoaded())
+                {
+                    SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                    saveFileDialog1.InitialDirectory = Path.GetDirectoryName(ImageFilename);
+                    saveFileDialog1.FileName = Path.GetFileName(ImageFilename);
+                    saveFileDialog1.Filter = "png files (*.png)|*.png";
+                    saveFileDialog1.FilterIndex = 2;
+                    saveFileDialog1.RestoreDirectory = true;
+                    saveFileDialog1.OverwritePrompt = true;
+
+                    DialogResult result = saveFileDialog1.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        ImageFilename = saveFileDialog1.FileName;
+                        pictureBox1.Image.Save(ImageFilename);
+                    }
                 }
             }
         }

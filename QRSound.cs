@@ -10,22 +10,44 @@ using NAudio.Wave;
 using System.IO;
 
 
+
 namespace WindowsFormsApplication1
 {
     class QRSound
     {
-        public string Filename { get; private set; }
         string WavFilename { get; set; }
         byte[] Data { get; set; }
         WaveOut Output { get; set; }
 
         public void OpenImage(string filepath)
         {
-            Filename = filepath;
-
             QRCodeDecoder decoder = new QRCodeDecoder();
-            QRCodeBitmapImage image = new QRCodeBitmapImage(new Bitmap(Filename));
+            QRCodeBitmapImage image = new QRCodeBitmapImage(new Bitmap(filepath));
             Data = (byte[])(Array)decoder.DecodeBytes(image);
+        }
+
+        public void OpenAudio(string filepath)
+        {
+            WaveFileReader reader = new WaveFileReader(filepath);
+
+            WaveFormatConversionStream rawstream = new WaveFormatConversionStream(new WaveFormat(8000, sizeof(byte) * 8, 1), reader);
+            Data = new byte[rawstream.Length];
+            rawstream.Read(Data, 0, (int)rawstream.Length);
+        }
+
+        public Image GetQRImage()
+        {
+            QRCodeEncoder encoder = new QRCodeEncoder();
+            encoder.QRCodeEncodeMode = QRCodeEncoder.ENCODE_MODE.BYTE;
+            encoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.L;
+            encoder.QRCodeVersion = 0; //http://platform.twit88.com/news/60
+
+            byte[] towrite = Data;
+            Array.Resize(ref towrite, 1024); //Not sure how the max is defined in the library (1kB is sufficient)
+
+            string asastring = System.Text.Encoding.UTF8.GetString(towrite);
+            Image qrimage = encoder.Encode(asastring);
+            return qrimage;
         }
 
         public void SaveAudio(string filepath)
