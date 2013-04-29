@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("QRSound")]
-[assembly: AssemblyDescription("Turn QR Codes into sounds")]
+[assembly: AssemblyDescription("Turn QR Codes into sounds.  hi.MikeJones@gmail.com  http://audioprogrammermike.tumblr.com/")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mike Jones")]
 [assembly: AssemblyProduct("QRSound")]
-[assembly: AssemblyCopyright("Copyright © Mike Jones 2013")]
+[assembly: AssemblyCopyright("Copyright © 2013 Mike Jones")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
