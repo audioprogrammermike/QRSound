@@ -11,9 +11,9 @@ using System.IO;
 
 
 
-namespace WindowsFormsApplication1
+namespace QRSound
 {
-    class QRSound
+    class QRSoundConverter
     {
         string WavFilename { get; set; }
         byte[] Data { get; set; }

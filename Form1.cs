@@ -11,13 +11,13 @@ using MessagingToolkit.QRCode;
 using System.IO;
 using NAudio.Wave;
 
-namespace WindowsFormsApplication1
+namespace QRSound
 {
     public partial class Form1 : Form
     {
         string WavFilename { get; set; }
         string ImageFilename { get; set; }
-        QRSound Sound { get; set; }
+        QRSoundConverter Sound { get; set; }
         bool SaveNeeded { get; set; }
 
         enum eMode
@@ -39,7 +39,7 @@ namespace WindowsFormsApplication1
 
             saveToolStripMenuItem.Enabled = false;
 
-            Sound = new QRSound();
+            Sound = new QRSoundConverter();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e) {

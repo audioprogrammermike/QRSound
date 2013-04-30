@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace QRSound
 {
     partial class AboutBox1
     {
